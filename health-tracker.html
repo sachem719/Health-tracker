@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sachem's Health Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --card2: #1a1a24;
+    --accent: #c8f060;
+    --accent2: #60f0c8;
+    --red: #ff5a5a;
+    --orange: #ffb347;
+    --text: #f0f0f0;
+    --muted: #666680;
+    --border: #2a2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .header-left p {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .date-badge {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    letter-spacing: 0.5px;
+  }
+  .date-badge span {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* OZEMPIC + OTF BANNER */
+  .routine-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .routine-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .routine-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pill-otf .dot { background: #ff6b35; }
+  .pill-oz .dot { background: var(--accent2); }
+
+  /* BIG STAT */
+  .big-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .big-stat::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(200,240,96,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .big-stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .big-stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  .big-stat-value span {
+    font-size: 28px;
+    color: var(--muted);
+  }
+  .big-stat-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .big-stat-sub strong { color: var(--accent2); }
+  .progress-bar-wrap {
+    margin-top: 16px;
+    background: var(--bg);
+    border-radius: 6px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    transition: width 1s ease;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .progress-label span:last-child { color: var(--accent); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin: 24px 0 12px;
+  }
+
+  /* STAT GRID */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .stat-card-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .stat-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .stat-card-value.good { color: var(--accent); }
+  .stat-card-value.warn { color: var(--orange); }
+  .stat-card-value.bad { color: var(--red); }
+  .stat-card-value.neutral { color: var(--text); }
+  .stat-card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .stat-card-sub.good { color: var(--accent2); }
+  .stat-card-sub.warn { color: var(--orange); }
+
+  /* FULL WIDTH STAT */
+  .stat-full {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stat-full-left { font-size: 13px; color: var(--muted); }
+  .stat-full-left strong { display: block; color: var(--text); font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .stat-full-right {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+  .stat-full-right.good { color: var(--accent); }
+  .stat-full-right.warn { color: var(--orange); }
+  .stat-full-right.bad { color: var(--red); }
+
+  /* PROTEIN PLAN */
+  .protein-section {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .protein-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .protein-header h3 { font-size: 14px; font-weight: 600; }
+  .protein-target {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .protein-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .protein-item:last-child { border-bottom: none; }
+  .protein-item-left { color: var(--text); }
+  .protein-item-left span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .protein-item-right {
+    font-weight: 600;
+    color: var(--accent2);
+    font-size: 14px;
+  }
+
+  /* HYDRATION */
+  .hydration-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .hydration-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .hydration-target { font-size: 12px; color: var(--muted); font-weight: 400; }
+  .water-cups {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .cup {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .cup.filled {
+    background: rgba(96, 240, 200, 0.15);
+    border-color: var(--accent2);
+  }
+  .hydration-note {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .hydration-note strong { color: var(--orange); }
+
+  /* OTF TRACKER */
+  .otf-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .otf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .otf-header h3 { font-size: 14px; font-weight: 600; }
+  .otf-brand {
+    font-size: 11px;
+    background: #ff6b35;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .week-days {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .day-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 0;
+  }
+  .day-btn .day-letter { font-size: 13px; color: var(--text); }
+  .day-btn.active {
+    background: rgba(255,107,53,0.15);
+    border-color: #ff6b35;
+    color: #ff6b35;
+  }
+  .day-btn.active .day-letter { color: #ff6b35; }
+  .otf-note {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* PROGRESS CALLOUT */
+  .callout {
+    background: linear-gradient(135deg, rgba(200,240,96,0.08), rgba(96,240,200,0.05));
+    border: 1px solid rgba(200,240,96,0.2);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .callout-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .callout-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .callout-stat-label { color: var(--muted); }
+  .callout-stat-value { font-weight: 600; color: var(--accent); }
+  .callout-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(200,240,96,0.1);
+    line-height: 1.6;
+  }
+
+  /* DAILY PLAN */
+  .plan-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .plan-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .plan-time {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .plan-time-label {
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    min-width: 60px;
+    padding-top: 1px;
+    text-transform: uppercase;
+  }
+  .plan-time-content { font-size: 13px; line-height: 1.5; }
+  .plan-time-content strong { color: var(--text); display: block; margin-bottom: 2px; }
+  .plan-time-content span { color: var(--muted); font-size: 12px; }
+
+  /* VISCERAL FAT WARNING */
+  .warning-card {
+    background: rgba(255,90,90,0.06);
+    border: 1px solid rgba(255,90,90,0.2);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 10px;
+  }
+  .warning-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .warning-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .warning-text strong { color: var(--text); }
+
+  /* SCROLL ANIMATION */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.1s; }
+  .fade-in:nth-child(3) { animation-delay: 0.15s; }
+  .fade-in:nth-child(4) { animation-delay: 0.2s; }
+  .fade-in:nth-child(5) { animation-delay: 0.25s; }
+  .fade-in:nth-child(6) { animation-delay: 0.3s; }
+  .fade-in:nth-child(7) { animation-delay: 0.35s; }
+  .fade-in:nth-child(8) { animation-delay: 0.4s; }
+  .fade-in:nth-child(9) { animation-delay: 0.45s; }
+</style>
+</head>
+<body>
+
+<div class="header fade-in">
+  <div class="header-left">
+    <h1>MY STATS</h1>
+    <p>Health Dashboard</p>
+  </div>
+  <div class="date-badge">
+    Started<span>Aug 2025</span>
+  </div>
+</div>
+
+<!-- ROUTINE PILLS -->
+<div class="routine-bar fade-in">
+  <div class="routine-pill pill-otf">
+    <div class="dot"></div>
+    Orangetheory 1-2x/wk
+  </div>
+  <div class="routine-pill pill-oz">
+    <div class="dot"></div>
+    Ozempic Active
+  </div>
+</div>
+
+<!-- WEIGHT BIG STAT -->
+<div class="big-stat fade-in">
+  <div class="big-stat-label">Current Weight</div>
+  <div class="big-stat-value">298.6 <span>lbs</span></div>
+  <div class="big-stat-sub">Down from 319 lbs — <strong>~20 lbs lost since Aug 2025</strong></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" style="width: 14%"></div>
+  </div>
+  <div class="progress-label">
+    <span>Start: 319 lb</span>
+    <span>Goal: 155.4 lb</span>
+  </div>
+</div>
+
+<!-- KEY STATS GRID -->
+<div class="section-title fade-in">Body Composition</div>
+
+<div class="stat-grid fade-in">
+  <div class="stat-card">
+    <div class="stat-card-label">Body Fat</div>
+    <div class="stat-card-value bad">50.5<span style="font-size:18px;color:var(--muted)">%</span></div>
+    <div class="stat-card-sub warn">Goal: under 35%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-label">Muscle Mass</div>
+    <div class="stat-card-value good">138.4<span style="font-size:18px;color:var(--muted)"> lb</span></div>
+    <div class="stat-card-sub good">✓ Strong base</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-label">Skeletal Muscle</div>
+    <div class="stat-card-value good">34.0<span style="font-size:18px;color:var(--muted)">%</span></div>
+    <div class="stat-card-sub good">✓ OTF is working</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-label">Body Water</div>
+    <div class="stat-card-value warn">40.0<span style="font-size:18px;color:var(--muted)">%</span></div>
+    <div class="stat-card-sub warn">Need 45–60%</div>
+  </div>
+</div>
+
+<div class="stat-grid fade-in">
+  <div class="stat-card">
+    <div class="stat-card-label">BMR</div>
+    <div class="stat-card-value neutral">2,230<span style="font-size:14px;color:var(--muted)"> kcal</span></div>
+    <div class="stat-card-sub">Burned at rest</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-label">Body Age</div>
+    <div class="stat-card-value warn">34</div>
+    <div class="stat-card-sub warn">↑ 1 from last check</div>
+  </div>
+</div>
+
+<div class="stat-full fade-in">
+  <div class="stat-full-left">
+    <strong>Visceral Fat</strong>
+    Ideal is under 9
+  </div>
+  <div class="stat-full-right bad">17.1</div>
+</div>
+
+<!-- REAL PROGRESS CALLOUT -->
+<div class="callout fade-in">
+  <div class="callout-title">📉 Real Progress Since Aug 2025</div>
+  <div class="callout-stat">
+    <span class="callout-stat-label">Weight lost</span>
+    <span class="callout-stat-value">~20 lbs</span>
+  </div>
+  <div class="callout-stat">
+    <span class="callout-stat-label">Visceral fat trend</span>
+    <span class="callout-stat-value">↓ Dropping</span>
+  </div>
+  <div class="callout-stat">
+    <span class="callout-stat-label">Skeletal muscle</span>
+    <span class="callout-stat-value">↑ 32% → 34%</span>
+  </div>
+  <div class="callout-stat">
+    <span class="callout-stat-label">Subcutaneous fat</span>
+    <span class="callout-stat-value">↓ 32% → 31.3%</span>
+  </div>
+  <div class="callout-note">The small scale uptick this week (1.5 lbs) is normal fluctuation. Your trend line since August is consistently going in the right direction.</div>
+</div>
+
+<!-- VISCERAL FAT WARNING -->
+<div class="warning-card fade-in">
+  <div class="warning-title">⚠ Watch: Visceral Fat at 17.1</div>
+  <div class="warning-text">This is the fat around your organs — more important than the scale number. <strong>The good news:</strong> Ozempic specifically targets visceral fat. Keep consistent and this number will fall faster than body weight does.</div>
+</div>
+
+<!-- PROTEIN PLAN -->
+<div class="section-title fade-in">Daily Protein Plan</div>
+<div class="protein-section fade-in">
+  <div class="protein-header">
+    <h3>Daily Target</h3>
+    <div class="protein-target">120–150g</div>
+  </div>
+  <div class="protein-item">
+    <div class="protein-item-left">
+      Chobani / Oikos Pro Greek Yogurt
+      <span>Morning or post-OTF</span>
+    </div>
+    <div class="protein-item-right">~20g</div>
+  </div>
+  <div class="protein-item">
+    <div class="protein-item-left">
+      Quest Bar
+      <span>Mid-day or pre-OTF snack</span>
+    </div>
+    <div class="protein-item-right">~21g</div>
+  </div>
+  <div class="protein-item">
+    <div class="protein-item-left">
+      RXBar
+      <span>Backup / on the go</span>
+    </div>
+    <div class="protein-item-right">~12g</div>
+  </div>
+  <div class="protein-item">
+    <div class="protein-item-left">
+      Rotisserie Chicken / Turkey
+      <span>Dinner (easy + cheap)</span>
+    </div>
+    <div class="protein-item-right">~35–40g</div>
+  </div>
+  <div class="protein-item">
+    <div class="protein-item-left">
+      Eggs / Egg whites
+      <span>Any meal</span>
+    </div>
+    <div class="protein-item-right">~18g</div>
+  </div>
+</div>
+
+<!-- HYDRATION TRACKER -->
+<div class="hydration-card fade-in">
+  <div class="hydration-title">
+    Hydration Tracker
+    <span class="hydration-target">Goal: 10–12 cups/day</span>
+  </div>
+  <div class="water-cups" id="cups"></div>
+  <div class="hydration-note">
+    <strong>Ozempic suppresses thirst.</strong> Set a reminder to drink even when you don't feel like it. Aim for 16oz before OTF and 16oz after every class.
+  </div>
+</div>
+
+<!-- OTF TRACKER -->
+<div class="otf-card fade-in">
+  <div class="otf-header">
+    <h3>Workout This Week</h3>
+    <span class="otf-brand">OTF</span>
+  </div>
+  <div class="week-days" id="weekdays"></div>
+  <div class="otf-note">Tap the days you made it to class. 1–2x is enough right now — protect your consistency over frequency. Even one OTF class a week is preserving that 138 lbs of muscle.</div>
+</div>
+
+<!-- DAILY PLAN -->
+<div class="section-title fade-in">Realistic Daily Structure</div>
+<div class="plan-card fade-in">
+  <div class="plan-title">A Day That Actually Works</div>
+  <div class="plan-time">
+    <div class="plan-time-label">Morning</div>
+    <div class="plan-time-content">
+      <strong>Chobani Pro + water (16 oz)</strong>
+      <span>~20g protein before anything else. Ozempic works better with food in your stomach.</span>
+    </div>
+  </div>
+  <div class="plan-time">
+    <div class="plan-time-label">Mid-Day</div>
+    <div class="plan-time-content">
+      <strong>Quest Bar + 16 oz water</strong>
+      <span>Keep one in your bag. Non-negotiable grab on busy days.</span>
+    </div>
+  </div>
+  <div class="plan-time">
+    <div class="plan-time-label">OTF Days</div>
+    <div class="plan-time-content">
+      <strong>16 oz water before class, Greek yogurt or bar after</strong>
+      <span>Don't leave class without eating within 45 min. Protects muscle.</span>
+    </div>
+  </div>
+  <div class="plan-time">
+    <div class="plan-time-label">Dinner</div>
+    <div class="plan-time-content">
+      <strong>Rotisserie chicken + easy veggie</strong>
+      <span>Costco rotisserie = ~$5, ~35–40g protein, no effort required.</span>
+    </div>
+  </div>
+  <div class="plan-time">
+    <div class="plan-time-label">Night</div>
+    <div class="plan-time-content">
+      <strong>Last 16 oz of water</strong>
+      <span>Helps body water % come up over time. Your 40% needs to reach at least 45%.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Hydration cups
+  const cupsContainer = document.getElementById('cups');
+  const filled = JSON.parse(localStorage.getItem('cups') || '[]');
+  for (let i = 0; i < 12; i++) {
+    const cup = document.createElement('button');
+    cup.className = 'cup' + (filled.includes(i) ? ' filled' : '');
+    cup.textContent = '💧';
+    cup.onclick = () => {
+      cup.classList.toggle('filled');
+      const f = [...cupsContainer.querySelectorAll('.cup')].map((c,idx) => c.classList.contains('filled') ? idx : -1).filter(x => x >= 0);
+      try { localStorage.setItem('cups', JSON.stringify(f)); } catch(e) {}
+    };
+    cupsContainer.appendChild(cup);
+  }
+
+  // Week days
+  const days = ['M','T','W','Th','F','Sa','Su'];
+  const weekContainer = document.getElementById('weekdays');
+  const activeDays = JSON.parse(localStorage.getItem('otfDays') || '[]');
+  days.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (activeDays.includes(i) ? ' active' : '');
+    btn.innerHTML = `<span class="day-letter">${d}</span>OTF`;
+    btn.onclick = () => {
+      btn.classList.toggle('active');
+      const a = [...weekContainer.querySelectorAll('.day-btn')].map((b,idx) => b.classList.contains('active') ? idx : -1).filter(x => x >= 0);
+      try { localStorage.setItem('otfDays', JSON.stringify(a)); } catch(e) {}
+    };
+    weekContainer.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
